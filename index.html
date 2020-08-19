@@ -29,7 +29,7 @@
 </head>
 <body>
     <div id="left">
-    	<canvas id="sig-canvas" width="500" height="600">
+    	<canvas id="sig-canvas" width="500" height="500"  style = "border:2px solid #000000;">
     		Get a better browser, bro.
     	</canvas>
     </div>
@@ -45,8 +45,8 @@ fitToContainer(canvas);
 
 function fitToContainer(canvas){
   // Make it visually fill the positioned parent
-  canvas.style.width ='100%';
-  canvas.style.height='100%';
+  canvas.style.width ='500px';
+  canvas.style.height='500px';
   // ...then set the internal size to match
   canvas.width  = canvas.offsetWidth;
   canvas.height = canvas.offsetHeight;
@@ -91,6 +91,7 @@ function renderCanvas() {
   if (drawing) {
     ctx.moveTo(lastPos.x, lastPos.y);
     ctx.lineTo(mousePos.x, mousePos.y);
+    document.getElementById("code").value += "G1 " + "X" + mousePos.x + " Y" + mousePos.y + "\n";
     ctx.stroke();
     lastPos = mousePos;
   }
