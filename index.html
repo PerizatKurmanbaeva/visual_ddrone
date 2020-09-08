@@ -40,7 +40,220 @@
 
 
 <script>
+var canvas = document.getEl<!DOCTYPE html>
+<html>
+<head>
+	<title>CopterHack2020 D-Drone</title>
+	<style type="text/css">
+		html, body {
+		  height: 100%;
+		  margin: 0;
+		}
+		#left {
+		    width: 50%;
+		    height: 100%;
+		    display: inline-block;
+		    float: left;
+		}
+		#right {
+		    width: 50%;
+		    height: 100%;
+		    background: orange;
+		    display: inline-block;
+		    float: right;
+		}
+		#code {
+			width: 100%;
+			height: 100%; 
+			box-sizing: border-box;
+		}
+	</style>
+</head>
+<body>
+    <div id="left">
+    	<canvas id="sig-canvas" width="500" height="500"  style = "border:1px solid #000000;">
+    		
+    	</canvas>
+    </div>
+    <div id="right">
+    	<textarea id="code">Code will generate here...</textarea>
+    </div>
+
+
+
+<script>
 var canvas = document.getElementById("sig-canvas");
+fitToContainer(canvas);
+
+function fitToContainer(canvas){
+  // Make it visually fill the positioned parent
+  canvas.style.width ='500px';
+  canvas.style.height='500px';
+  // ...then set the internal size to match
+  canvas.width  = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+}
+
+var ctx = canvas.getContext("2d");
+ctx.strokeStyle = "#808080";
+ctx.lineWidth = 1;
+
+ctx.moveTo(0,0);
+ctx.lineTo(500,0);
+ctx.stroke();
+
+
+ctx.moveTo(0,125);
+ctx.lineTo(500,125);
+ctx.stroke();
+ctx.font = "13px Arial";
+ctx.fillText("50cm", 0, 125);
+
+ctx.moveTo(0,250);
+ctx.lineTo(500,250);
+ctx.stroke();
+ctx.font = "13px Arial";
+ctx.fillText("100cm", 0, 250);
+
+ctx.moveTo(0,375);
+ctx.lineTo(500,375);
+ctx.stroke();
+ctx.font = "13px Arial";
+ctx.fillText("150cm", 0, 375);
+
+ctx.moveTo(0,500);
+ctx.lineTo(500,500);
+ctx.stroke();
+ctx.font = "13px Arial";
+ctx.fillText("200cm", 0, 500);
+
+ctx.moveTo(125,0);
+ctx.lineTo(125,500);
+ctx.stroke();
+ctx.font = "13px Arial";
+ctx.fillText("50cm", 85, 12);
+
+ctx.moveTo(250,0);
+ctx.lineTo(250,500);
+ctx.stroke();
+ctx.font = "13px Arial";
+ctx.fillText("100cm", 210, 12);
+
+
+ctx.moveTo(375,0);
+ctx.lineTo(375,500);
+ctx.stroke();
+ctx.font = "13px Arial";
+ctx.fillText("150cm", 335, 12);
+
+
+ctx.moveTo(500,0);
+ctx.lineTo(500,500);
+ctx.stroke();
+ctx.font = "13px Arial";
+ctx.fillText("200cm", 460, 12);
+
+</script>
+<script>
+
+var ctx = canvas.getContext("2d");
+ctx.strokeStyle = "#FF0000";
+ctx.lineWidth = 7;
+
+var drawing = false;
+var mousePos = { x:0, y:0 };
+var lastPos = mousePos;
+canvas.addEventListener("mousedown", function (e) {
+        drawing = true;
+  lastPos = getMousePos(canvas, e);
+}, false);
+canvas.addEventListener("mouseup", function (e) {
+  drawing = false;
+}, false);
+canvas.addEventListener("mousemove", function (e) {
+  mousePos = getMousePos(canvas, e);
+}, false);
+
+function getMousePos(canvasDom, mouseEvent) {
+  var rect = canvasDom.getBoundingClientRect();
+  return {
+    x: mouseEvent.clientX - rect.left,
+    y: mouseEvent.clientY - rect.top
+  };
+}
+window.requestAnimFrame = (function (callback) {
+        return window.requestAnimationFrame || 
+           window.webkitRequestAnimationFrame ||
+           window.mozRequestAnimationFrame ||
+           window.oRequestAnimationFrame ||
+           window.msRequestAnimaitonFrame ||
+           function (callback) {
+        window.setTimeout(callback, 1000/60);
+           };
+})();
+function renderCanvas() {
+  if (drawing) {
+    ctx.moveTo(lastPos.x, lastPos.y);
+    ctx.lineTo(mousePos.x, mousePos.y);
+    document.getElementById("code").value += "G1 " + "X" + mousePos.x + " Y" + mousePos.y + "\n";
+    ctx.stroke();
+    lastPos = mousePos;
+  }
+}
+
+(function drawLoop () {
+  requestAnimFrame(drawLoop);
+  renderCanvas();
+})();
+canvas.addEventListener("touchstart", function (e) {
+        mousePos = getTouchPos(canvas, e);
+  var touch = e.touches[0];
+  var mouseEvent = new MouseEvent("mousedown", {
+    clientX: touch.clientX,
+    clientY: touch.clientY
+  });
+  canvas.dispatchEvent(mouseEvent);
+}, false);
+canvas.addEventListener("touchend", function (e) {
+  var mouseEvent = new MouseEvent("mouseup", {});
+  canvas.dispatchEvent(mouseEvent);
+}, false);
+canvas.addEventListener("touchmove", function (e) {
+  var touch = e.touches[0];
+  var mouseEvent = new MouseEvent("mousemove", {
+    clientX: touch.clientX,
+    clientY: touch.clientY
+  });
+  canvas.dispatchEvent(mouseEvent);
+}, false);
+
+// Get the position of a touch relative to the canvas
+function getTouchPos(canvasDom, touchEvent) {
+  var rect = canvasDom.getBoundingClientRect();
+  return {
+    x: touchEvent.touches[0].clientX - rect.left,
+    y: touchEvent.touches[0].clientY - rect.top
+  };
+}
+document.body.addEventListener("touchstart", function (e) {
+  if (e.target == canvas) {
+    e.preventDefault();
+  }
+}, false);
+document.body.addEventListener("touchend", function (e) {
+  if (e.target == canvas) {
+    e.preventDefault();
+  }
+}, false);
+document.body.addEventListener("touchmove", function (e) {
+  if (e.target == canvas) {
+    e.preventDefault();
+  }
+}, false);
+</script>
+</body>
+</html>
+ementById("sig-canvas");
 fitToContainer(canvas);
 
 function fitToContainer(canvas){
