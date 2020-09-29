@@ -24,10 +24,18 @@ function grid() {
 }
 
 function fitToContainer(canvas) {
-    canvas.style.width = '500px';
-    canvas.style.height = '500px';
+    console.log(screen.width);
+    if (screen.width > 500) {
+        canvas.style.width = '500px';
+        canvas.style.height = '500px';
+
+    } else {
+        canvas.style.width = (screen.width - 30) + 'px';
+        canvas.style.height = (screen.width - 30) + 'px';
+    }
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
+
 }
 
 var ctx = canvas.getContext("2d");

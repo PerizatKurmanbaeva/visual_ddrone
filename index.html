@@ -20,8 +20,8 @@
   <div class="container-fluid bg-warning text-dark p-3 mb-3">
     <div class="d-flex flex-column align-items-center">
       <h1> D-drone.</h1>
-      <h3>Добро пожаловать! </h3>
-      <p >Это сайт для отправки рисунка на коптер.</p>
+      <h3 class="d-none d-lg-block">Добро пожаловать! </h3>
+     
     </div>
 
     
@@ -41,12 +41,62 @@
       	</canvas>
       
         <button onclick='clearAll()' class="btn btn-warning">Reset</button>
-        <button type="button" class="btn btn-warning">Save</button>
-        <button type="button" class="btn btn-warning" id="show">Show</button>
-      	
+        <button type="button" class="btn btn-warning" onclick="alert('Пока не работает :)')">Save</button>
+        <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#show">Show</button>
+      	<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#instruction">Instructions</button>
       </div>
       <div id="right">
-      	<textarea id="code">CONFIG T22.5 B-22.5 L-22.0 R22.0 I-1 J1
+      	
+      </div>
+    </div>
+    <!-- The Modal -->
+    <div class="modal" id="instruction">
+      <div class="modal-dialog">
+        <div class="modal-content">
+
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title">Инструкция</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body">
+            Это сайт для отправки рисунка на коптер.
+            <p>Чтобы нарисовать что-то вы должны удерживать кнопку мышки и проводить по холсту, страясь не выходить за его рамки.</p>
+            <p> Функции кнопок:</p>
+            <ul>
+            	<li>Кнопка "Resert" очищает холст.</li>
+            	<li>Кнопка "Show"  показывает данные, которые будут отправлятся коптеру.</li>
+            </ul>
+             
+             
+
+          </div>
+
+          <!-- Modal footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- The Modal -->
+    <div class="modal" id="show">
+      <div class="modal-dialog">
+        <div class="modal-content">
+
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title">G-code</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body">
+            <textarea id="code">CONFIG T22.5 B-22.5 L-22.0 R22.0 I-1 J1
 D01 L1.0 R1.0
 TELEPORT X0 Y0 Z0
 G21 G90 G64 G40
@@ -59,6 +109,15 @@ G1 F3000
 G1 X0 Y0
 
 </textarea>
+           
+          </div>
+
+          <!-- Modal footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+          </div>
+
+        </div>
       </div>
     </div>
     <script type="text/javascript" src="js/draw.js"></script>
