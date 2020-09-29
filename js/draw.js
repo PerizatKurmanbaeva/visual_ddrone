@@ -1,6 +1,8 @@
 var canvas = document.getElementById("sig-canvas");
 fitToContainer(canvas);
 
+$('#code').hide();
+
 function grid() {
     ctx.strokeStyle = "#CC00CC";
     ctx.lineWidth = 0.4;
@@ -22,13 +24,30 @@ function grid() {
 }
 
 function fitToContainer(canvas) {
-    canvas.style.width = '500px';
-    canvas.style.height = '500px';
+    console.log(screen.width);
+    if (screen.width > 500) {
+        canvas.style.width = '500px';
+        canvas.style.height = '500px';
+
+    } else {
+        canvas.style.width = (screen.width - 30) + 'px';
+        canvas.style.height = (screen.width - 30) + 'px';
+    }
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
+
 }
 
 var ctx = canvas.getContext("2d");
+
+
+function clearCanvas() {
+    ctx.closePath();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    grid();
+    ctx.beginPath();
+}
+
 grid();
 
 
@@ -76,8 +95,9 @@ function renderCanvas() {
         ctx.lineTo(mousePos.x, mousePos.y);
         document.getElementById("code").value +=  "G01 F300.0 " + "X" + mousePos.x + " Y" + mousePos.y + "\n";
         lastPos = mousePos;
-        ctx.strokeStyle = "#FF0000";
+        ctx.strokeStyle = "#000000";
         ctx.lineWidth = 5;
+        ctx.lineCap = "round";
         ctx.stroke();
     }
 }
