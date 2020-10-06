@@ -1,5 +1,6 @@
 var canvas = document.getElementById("sig-canvas");
 fitToContainer(canvas);
+var mult = 0.12;
 
 $('#code').hide();
 
@@ -60,7 +61,9 @@ var lastPos = mousePos;
 canvas.addEventListener("mousedown", function(e) {
     drawing = true;
     lastPos = getMousePos(canvas, e);
-    document.getElementById("code").value +=  "G01 F300.0 " + "X" + lastPos.x + " Y" + lastPos.y + "\n";
+    let x = (lastPos.x) * mult;
+    let y = (canvas.width - lastPos.y) * mult;
+    document.getElementById("code").value +=  "G01 F300.0 " + "X" + x + " Y" + y + "\n";
     document.getElementById("code").value +=  "G00 F300.0 Z0.000" + "\n";
 }, false);
 canvas.addEventListener("mouseup", function(e) {
@@ -93,7 +96,9 @@ function renderCanvas() {
     if (drawing) {
         ctx.moveTo(lastPos.x, lastPos.y);
         ctx.lineTo(mousePos.x, mousePos.y);
-        document.getElementById("code").value +=  "G01 F300.0 " + "X" + mousePos.x + " Y" + mousePos.y + "\n";
+        let x = (mousePos.x) * mult;
+        let y = (canvas.width - mousePos.y)* mult;
+        document.getElementById("code").value +=  "G01 F300.0 " + "X" + x + " Y" + y + "\n";
         lastPos = mousePos;
         ctx.strokeStyle = "#000000";
         ctx.lineWidth = 5;
