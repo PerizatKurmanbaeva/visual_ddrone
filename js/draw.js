@@ -1,8 +1,19 @@
 var canvas = document.getElementById("sig-canvas");
 fitToContainer(canvas);
 var mult = 0.12;
+var scale = $("#scale");
 
-$('#code').hide();
+scale.on("input", function (event) {
+    mult = scale.val()
+})
+
+scale.on("change", function (event) {
+    mult = scale.val();
+})
+
+function round(value, decimals) {
+  return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+}
 
 function grid() {
     ctx.strokeStyle = "#CC00CC";
@@ -61,8 +72,8 @@ var lastPos = mousePos;
 canvas.addEventListener("mousedown", function(e) {
     drawing = true;
     lastPos = getMousePos(canvas, e);
-    let x = (lastPos.x) * mult;
-    let y = (canvas.width - lastPos.y) * mult;
+    let x = round((lastPos.x) * mult, 0);
+    let y = round((canvas.width - lastPos.y) * mult, 0);
     document.getElementById("code").value +=  "G01 F300.0 " + "X" + x + " Y" + y + "\n";
     document.getElementById("code").value +=  "G00 F300.0 Z0.000" + "\n";
 }, false);
@@ -96,8 +107,8 @@ function renderCanvas() {
     if (drawing) {
         ctx.moveTo(lastPos.x, lastPos.y);
         ctx.lineTo(mousePos.x, mousePos.y);
-        let x = (mousePos.x) * mult;
-        let y = (canvas.width - mousePos.y)* mult;
+        let x = round((mousePos.x) * mult, 0);
+        let y = round((canvas.width - mousePos.y)* mult, 0);
         document.getElementById("code").value +=  "G01 F300.0 " + "X" + x + " Y" + y + "\n";
         lastPos = mousePos;
         ctx.strokeStyle = "#000000";

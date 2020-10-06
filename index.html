@@ -15,6 +15,7 @@
 
   <!-- Latest compiled JavaScript -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  
 </head>
 <body>
   <div class="container-fluid bg-warning text-dark p-3 mb-3">
@@ -39,11 +40,13 @@
       	<canvas id="sig-canvas" width="500" height="500"  style = "border:1px solid #000000;">
       		
       	</canvas>
-      
-        <button onclick='clearAll()' class="btn btn-warning">Reset</button>
-        <button type="button" class="btn btn-warning" onclick="alert('Пока не работает :)')">Save</button>
-        <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#show">Show</button>
-      	<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#instruction">Instructions</button>
+        <div class="d-flex">
+          <button onclick='clearAll()' class="btn btn-warning m-1">Reset</button>
+          <button type="button" class="btn btn-warning m-1" onclick="alert('Пока не работает :)')">Save</button>
+          <button type="button" class="btn btn-warning m-1" data-toggle="modal" data-target="#show">Show</button>
+        	<button type="button" class="btn btn-warning m-1" data-toggle="modal" data-target="#instruction">Instructions</button>
+          <input class="col-4 m-1" type="number" value="0.2" data-decimals="1" min="0.1" max="2" step="0.1" id="scale" />
+        </div>
       </div>
       <div id="right">
       	
@@ -76,6 +79,7 @@
 
           <!-- Modal footer -->
           <div class="modal-footer">
+
             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
           </div>
 
@@ -84,19 +88,19 @@
     </div>
 
     <!-- The Modal -->
-    <div class="modal" id="show">
+    <div class="modal fade" id="show" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
 
           <!-- Modal Header -->
           <div class="modal-header">
-            <h4 class="modal-title">G-code</h4>
+            <h4 class="modal-title" id="exampleModalLongTitle">G-code</h4>
             <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
 
           <!-- Modal body -->
           <div class="modal-body">
-            <textarea id="code">CONFIG T22.5 B-22.5 L-22.0 R22.0 I-1 J1
+            <textarea id="code" class="md-textarea form-control" rows="10">CONFIG T22.5 B-22.5 L-22.0 R22.0 I-1 J1
 D01 L1.0 R1.0
 TELEPORT X0 Y0 Z0
 G21 G90 G64 G40
@@ -114,14 +118,19 @@ G1 X0 Y0
 
           <!-- Modal footer -->
           <div class="modal-footer">
+            <button type="button" class="btn btn-info" id="copy-btn" onclick="copyText()">Copy</button>
             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
           </div>
 
         </div>
       </div>
     </div>
+    
     <script type="text/javascript" src="js/draw.js"></script>
     <script type="text/javascript" src="js/ui.js"></script>
-
+    <script src="js/bootstrap-input-spinner.js"></script>
+    <script>
+        $("input[type='number']").inputSpinner()
+    </script>
 </body>
 </html>

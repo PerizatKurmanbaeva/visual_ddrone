@@ -15,10 +15,9 @@ G1 X0 Y0`;
 
 }
 
-$("#show").click(function(){
-	if ($('#code').is(':hidden')) {
-	  $('#code').show();
-	} else {
-	  $('#code').hide();
-	}
-});
+
+function copyText(){
+    document.getElementById("code").select();
+    document.execCommand("copy");
+    $('#copy-btn').text("copied")
+}
