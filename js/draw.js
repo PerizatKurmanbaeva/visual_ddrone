@@ -2,6 +2,8 @@ var canvas = document.getElementById("sig-canvas");
 fitToContainer(canvas);
 var mult = 0.12;
 var scale = $("#scale");
+var oldX = 0
+var oldY = 0;
 
 scale.on("input", function (event) {
     mult = scale.val()
@@ -72,10 +74,12 @@ var lastPos = mousePos;
 canvas.addEventListener("mousedown", function(e) {
     drawing = true;
     lastPos = getMousePos(canvas, e);
-    let x = round((lastPos.x) * mult, 0);
-    let y = round((canvas.width - lastPos.y) * mult, 0);
+    let x = round((lastPos.x) * mult, 2);
+    let y = round((canvas.width - lastPos.y) * mult, 2);
+    
     document.getElementById("code").value +=  "G01 F300.0 " + "X" + x + " Y" + y + "\n";
     document.getElementById("code").value +=  "G00 F300.0 Z0.000" + "\n";
+    
 }, false);
 canvas.addEventListener("mouseup", function(e) {
     drawing = false;
@@ -107,9 +111,14 @@ function renderCanvas() {
     if (drawing) {
         ctx.moveTo(lastPos.x, lastPos.y);
         ctx.lineTo(mousePos.x, mousePos.y);
-        let x = round((mousePos.x) * mult, 0);
-        let y = round((canvas.width - mousePos.y)* mult, 0);
-        document.getElementById("code").value +=  "G01 F300.0 " + "X" + x + " Y" + y + "\n";
+        let x = round((mousePos.x) * mult, 2);
+        let y = round((canvas.width - mousePos.y)* mult, 2);
+        if (oldX != x || oldY != y) {
+            document.getElementById("code").value +=  "G01 F300.0 " + "X" + x + " Y" + y + "\n";
+        }
+        oldX = x;
+        oldY = y;
+
         lastPos = mousePos;
         ctx.strokeStyle = "#000000";
         ctx.lineWidth = 5;
