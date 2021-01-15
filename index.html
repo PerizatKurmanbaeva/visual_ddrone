@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>CopterHack2020 D-Drone</title>
+  <title>CopterHack2020 D-Drone</title>
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" type="text/css" href="css/style.css">
   <!-- Latest compiled and minified CSS -->
@@ -9,6 +10,8 @@
 
   <!-- jQuery library -->
   <script src="js/jquery.min.js"></script>
+
+  <script src="js/roslib.js"></script>
 
   <!-- Popper JS -->
   <script src="js/popper.min.js"></script>
@@ -38,19 +41,21 @@
     </div>
     <div class="container">
       <div id="left">
-      	<canvas id="sig-canvas" width="500" height="500"  style = "border:1px solid #000000;">
-      		
-      	</canvas>
+        <canvas id="sig-canvas" width="500" height="500"  style = "border:1px solid #000000;">
+          
+        </canvas>
         <div class="d-flex">
           <button onclick='clearAll()' class="btn btn-warning m-1">Reset</button>
           <button type="button" class="btn btn-warning m-1" onclick="alert('Пока не работает :)')">Save</button>
           <button type="button" class="btn btn-warning m-1" data-toggle="modal" data-target="#show">Show</button>
-        	<button type="button" class="btn btn-warning m-1" data-toggle="modal" data-target="#instruction">Instructions</button>
-          <input class="col-4 m-1" type="number" value="0.2" data-decimals="1" min="0.1" max="2" step="0.1" id="scale" />
+          <button type="button" class="btn btn-warning m-1" data-toggle="modal" data-target="#instruction">Instructions</button>
+          <input class="col-4 m-1" type="number" value="0.004" data-decimals="3" min="0.001" max="2.001" step="0.001" id="scale" />
 
         </div>
         <div class="d-flex">
           <button type="button" class="btn btn-warning m-1" id="img-select">IMG</button>
+          <button type="button" class="btn btn-warning m-1" onclick="rainbow()">Telemtry</button>
+          <button type="button" class="btn btn-warning m-1" onclick="flight()">FLIGHT</button>
         </div>
       </div>
       <div id="right">
@@ -74,8 +79,8 @@
             <p>Чтобы нарисовать что-то вы должны удерживать кнопку мышки и проводить по холсту, страясь не выходить за его рамки.</p>
             <p> Функции кнопок:</p>
             <ul>
-            	<li>Кнопка "Resert" очищает холст.</li>
-            	<li>Кнопка "Show"  показывает данные, которые будут отправлятся коптеру.</li>
+              <li>Кнопка "Resert" очищает холст.</li>
+              <li>Кнопка "Show"  показывает данные, которые будут отправлятся коптеру.</li>
             </ul>
              
              
@@ -137,5 +142,68 @@ G1 X0 Y0
     <script>
         $("input[type='number']").inputSpinner()
     </script>
+    
+    <script type="text/javascript">
+        // Establish roslibjs connection
+        var ros = new ROSLIB.Ros({ url: 'ws://' + location.hostname + ':9090' });
+
+        ros.on('connection', function () {
+            // Connection callback
+            console.log('Connected');
+        });
+
+        // Declare get_telemetry service client
+        var getTelemetry = new ROSLIB.Service({ ros: ros, name : '/get_telemetry', serviceType : 'clover/GetTelemetry' });
+
+        // Call get_telemetry
+        getTelemetry.callService(new ROSLIB.ServiceRequest({ frame_id: 'map' }), function(result) {
+            // Service respond callback
+            console.log('Telemetry: ' + JSON.stringify(result));
+        });
+
+        // Subscribe to `/mavros/state` topic
+        /*
+        var stateSub = new ROSLIB.Topic({ ros : ros, name : '/mavros/state', messageType : 'mavros_msgs/State' });
+        stateSub.subscribe(function(msg) {
+            // Topic message callback
+            console.log('State: ', msg);
+        });
+        */
+
+        var ledService = new ROSLIB.Service({ ros: ros, name : '/led/set_effect', serviceType : 'clover/Led/SetEffect' });
+
+        function rainbow() {
+          ledService.callService(new ROSLIB.ServiceRequest({effect: 'fade', r: 0, g: 0, b: 255}), function(result) {
+              console.log('LED RAINBOW!!!' + JSON.stringify(result));
+          });
+        }
+
+        var flightService = new ROSLIB.Service({ ros: ros, name : '/navigate', serviceType : 'clover/Navigate' });
+        var armed = false;
+
+        function flight() {
+          let cordinate = gcodeArr.pop();
+         
+          var cordY = cordinate[1];
+          var cordX = cordinate[0];
+          if (armed === false) {
+            flightService.callService(new ROSLIB.ServiceRequest({x: cordX, y: 0.0, z: cordY, yaw: 0.0, yaw_rate: 0.0, speed: 0.5, frame_id: 'body', auto_arm: true}), function(result) {
+                console.log('FLIGHT!!!' + JSON.stringify(result));
+            });
+            armed = true;
+          }
+          else {
+            flightService.callService(new ROSLIB.ServiceRequest({x: cordX, y: 0.0, z: cordY, yaw: 0.0, yaw_rate: 0.0, speed: 0.5, frame_id: 'body'}), function(result) {
+                console.log('FLIGHT!!!' + JSON.stringify(result));
+            });
+          }
+          setTimeout(flight(), 2000);
+          
+        }
+
+
+
+    </script>
+
 </body>
 </html>
