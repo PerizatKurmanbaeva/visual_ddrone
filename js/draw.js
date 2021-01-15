@@ -1,9 +1,11 @@
 var canvas = document.getElementById("sig-canvas");
 fitToContainer(canvas);
-var mult = 0.12;
+var mult = 0.004;
 var scale = $("#scale");
 var oldX = 0
 var oldY = 0;
+var gcodeArr = new Array(); 
+gcodeArr.push([0, 1.5]);
 
 scale.on("input", function (event) {
     mult = scale.val()
@@ -76,6 +78,8 @@ canvas.addEventListener("mousedown", function(e) {
     lastPos = getMousePos(canvas, e);
     let x = round((lastPos.x) * mult, 2);
     let y = round((canvas.width - lastPos.y) * mult, 2);
+
+    gcodeArr.push([x, y]);
     
     document.getElementById("code").value +=  "G01 F300.0 " + "X" + x + " Y" + y + "\n";
     document.getElementById("code").value +=  "G00 F300.0 Z0.000" + "\n";
@@ -114,6 +118,8 @@ function renderCanvas() {
         let x = round((mousePos.x) * mult, 2);
         let y = round((canvas.width - mousePos.y)* mult, 2);
         if (oldX != x || oldY != y) {
+            gcodeArr.push([x, y]);
+
             document.getElementById("code").value +=  "G01 F300.0 " + "X" + x + " Y" + y + "\n";
         }
         oldX = x;
