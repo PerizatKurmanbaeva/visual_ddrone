@@ -54,8 +54,12 @@
         </div>
         <div class="d-flex">
           <button type="button" class="btn btn-warning m-1" id="img-select">IMG</button>
-          <button type="button" class="btn btn-warning m-1" onclick="rainbow()">Telemtry</button>
-          <button type="button" class="btn btn-warning m-1" onclick="flight()">FLIGHT</button>
+          <button type="button" class="btn btn-warning m-1" onclick="down()">Down</button>
+          <button type="button" class="btn btn-warning m-1" onclick="up()">Up</button> 
+          <button type="button" class="btn btn-warning m-1" onclick="showTime()">Time</button>
+          <div id="MyClockDisplay" class="clock" onload="showTime()"></div>
+          <!--<button type="button" class="btn btn-warning m-1" onclick="flight()">FLIGHT</button>-->
+
         </div>
       </div>
       <div id="right">
@@ -152,6 +156,13 @@ G1 X0 Y0
             console.log('Connected');
         });
 
+        var cmd = new ROSLIB.Topic({
+            ros: ros,
+            name: '/paint',
+            messageType: 'std_msgs/String'
+        });
+
+
         // Declare get_telemetry service client
         var getTelemetry = new ROSLIB.Service({ ros: ros, name : '/get_telemetry', serviceType : 'clover/GetTelemetry' });
 
@@ -172,10 +183,13 @@ G1 X0 Y0
 
         var ledService = new ROSLIB.Service({ ros: ros, name : '/led/set_effect', serviceType : 'clover/Led/SetEffect' });
 
-        function rainbow() {
-          ledService.callService(new ROSLIB.ServiceRequest({effect: 'fade', r: 0, g: 0, b: 255}), function(result) {
-              console.log('LED RAINBOW!!!' + JSON.stringify(result));
-          });
+        function down() {
+          var mess = new ROSLIB.Message({data: "down"});
+          cmd.publish(mess);
+        }
+        function up() {
+          var mess = new ROSLIB.Message({data: "up"});
+          cmd.publish(mess);
         }
 
         var flightService = new ROSLIB.Service({ ros: ros, name : '/navigate', serviceType : 'clover/Navigate' });
@@ -183,7 +197,7 @@ G1 X0 Y0
 
         function flight() {
           let cordinate = gcodeArr.pop();
-         
+          
           var cordY = cordinate[1];
           var cordX = cordinate[0];
           if (armed === false) {
@@ -197,10 +211,29 @@ G1 X0 Y0
                 console.log('FLIGHT!!!' + JSON.stringify(result));
             });
           }
-          setTimeout(flight(), 2000);
-          
+          // setTimeout(fl     
         }
+        var dt = new Date();
+        document.getElementById("datetime").innerHTML = dt.showTime();
 
+        function showTime(){
+          var date = new Date();
+          var h = date.getHours(); // 0 - 23
+          var m = date.getMinutes(); // 0 - 59
+          var s = date.getSeconds(); // 0 - 59
+          var mils = date.getMilliseconds();
+    
+          h = (h < 10) ? "0" + h : h;
+          m = (m < 10) ? "0" + m : m;
+          s = (s < 10) ? "0" + s : s;
+          mils = (mils < 10) ? "0" + mils : mils;
+          var time = h + ":" + m + ":" + s + ":" + mils;
+          document.getElementById("MyClockDisplay").innerText = time;
+          document.getElementById("MyClockDisplay").textContent = time;
+    
+          setTimeout(showTime, 1000);
+    
+          }
 
 
     </script>
