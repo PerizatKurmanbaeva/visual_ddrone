@@ -5,7 +5,8 @@ var scale = $("#scale");
 var oldX = 0
 var oldY = 0;
 var gcodeArr = new Array(); 
-gcodeArr.push([0, 1.5]);
+// gcodeArr.push([0, 1.5]);
+
 
 scale.on("input", function (event) {
     mult = scale.val()
@@ -76,7 +77,7 @@ var lastPos = mousePos;
 canvas.addEventListener("mousedown", function(e) {
     drawing = true;
     lastPos = getMousePos(canvas, e);
-    let x = round((lastPos.x) * mult, 2);
+    let x = round((lastPos.x - 250) * mult, 2);
     let y = round((canvas.width - lastPos.y) * mult, 2);
 
     gcodeArr.push([x, y]);
@@ -115,12 +116,13 @@ function renderCanvas() {
     if (drawing) {
         ctx.moveTo(lastPos.x, lastPos.y);
         ctx.lineTo(mousePos.x, mousePos.y);
-        let x = round((mousePos.x) * mult, 2);
+        let x = round((mousePos.x - 250) * mult, 2);
         let y = round((canvas.width - mousePos.y)* mult, 2);
-        if (oldX != x || oldY != y) {
+        if (oldX != x   || oldY != y) {
             gcodeArr.push([x, y]);
 
             document.getElementById("code").value +=  "G01 F300.0 " + "X" + x + " Y" + y + "\n";
+            
         }
         oldX = x;
         oldY = y;
