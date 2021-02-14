@@ -4,7 +4,9 @@ var mult = 0.004;
 var scale = $("#scale");
 var oldX = 0
 var oldY = 0;
-var gcodeArr = new Array(); 
+var gcodeArr = new Array();
+var messUp = new ROSLIB.Message({data: "up"});
+var messDown = new ROSLIB.Message({data: "down"});
 // gcodeArr.push([0, 1.5]);
 
 
@@ -80,15 +82,23 @@ canvas.addEventListener("mousedown", function(e) {
     let x = round((lastPos.x - 250) * mult, 2);
     let y = round((canvas.width - lastPos.y) * mult, 2);
 
-    gcodeArr.push([x, y]);
+    //gcodeArr.push([x, y]);
     
     document.getElementById("code").value +=  "G01 F300.0 " + "X" + x + " Y" + y + "\n";
     document.getElementById("code").value +=  "G00 F300.0 Z0.000" + "\n";
+    var mess = messUp;
+          //cmd.publish(mess);
+    gcodeArr.push([x, y, mess]);
     
 }, false);
 canvas.addEventListener("mouseup", function(e) {
+    let x = round((lastPos.x - 250) * mult, 2);
+    let y = round((canvas.width - lastPos.y) * mult, 2);
     drawing = false;
     document.getElementById("code").value +=  "G00 F300.0 Z90.000" + "\n";
+    var mess = messDown;
+          //cmd.publish(mess);
+    gcodeArr.push([x, y, mess]);
 }, false);
 canvas.addEventListener("mousemove", function(e) {
     mousePos = getMousePos(canvas, e);
