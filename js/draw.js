@@ -4,8 +4,8 @@ var mult = 0.004;
 var scale = $("#scale");
 var oldX = 0
 var oldY = 0;
-var gcodeArr = new Array();
-// gcodeArr.push([0, 1.5]);
+var gcodeArr = new Array(); 
+gcodeArr.push([0, 1.5]);
 
 
 scale.on("input", function (event) {
@@ -84,6 +84,7 @@ canvas.addEventListener("mousedown", function(e) {
     
     document.getElementById("code").value +=  "G01 F300.0 " + "X" + x + " Y" + y + "\n";
     document.getElementById("code").value +=  "G00 F300.0 Z0.000" + "\n";
+    gcodeArr.push([x, y, "down"]);
     
 }, false);
 canvas.addEventListener("mouseup", function(e) {
@@ -91,6 +92,7 @@ canvas.addEventListener("mouseup", function(e) {
     let y = round((canvas.width - lastPos.y) * mult, 2);
     drawing = false;
     document.getElementById("code").value +=  "G00 F300.0 Z90.000" + "\n";
+    gcodeArr.push([x, y, "up"]);
 }, false);
 canvas.addEventListener("mousemove", function(e) {
     mousePos = getMousePos(canvas, e);
