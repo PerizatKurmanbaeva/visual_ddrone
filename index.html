@@ -59,7 +59,7 @@
           <button type="button" class="btn btn-warning m-1" onclick="showTime()">Time</button>
           <div id="MyClockDisplay" class="clock" onload="showTime()"></div>
 
-          <!--<button type="button" class="btn btn-warning m-1" onclick="flight()">FLIGHT</button>-->
+          <button type="button" class="btn btn-warning m-1" onclick="checking()">FLIGHT</button>
 
         </div>
       </div>
@@ -165,31 +165,38 @@ G1 X0 Y0
 
         // Declare get_telemetry service client
         var getTelemetry = new ROSLIB.Service({ ros: ros, name : '/get_telemetry', serviceType : 'clover/GetTelemetry' });
+        getTelemetry.callService(new ROSLIB.ServiceRequest({ frame_id: 'body' }), function(result) {
+            console.log('Telemetry: ' + JSON.stringify(result));
+        });
 
-
-        // Call get_telemetry
+        
+        function telem() {
         let telemetryTimer = setInterval(() =>
         getTelemetry.callService(new ROSLIB.ServiceRequest({ frame_id: 'aruco_122' }), function(result) {
             // Service respond callback
 
-            if (typeof gcodeArr !== 'undefined' && gcodeArr.length != 0) {
-              
-              ctx.beginPath()
-              console.log(Math.abs(result.x - gcodeArr[0][0]) + " | " + Math.abs((result.z - 1) - gcodeArr[0][1]));
-              
-              if ((Math.abs(result.x - gcodeArr[0][0]) <= 0.01) && (Math.abs((result.z - 1) - gcodeArr[0][1]) <= 0.01)) {
-                if (gcodeArr[0].length === 3) {
-                  let position = gcodeArr[0][2];
+          if (typeof gcodeArr !== 'undefined' && gcodeArr.length != 0) {
+          
+            ctx.beginPath()
+            console.log(Math.abs(result.x - gcodeArr[0][0]) + " | " + Math.abs((result.z - 1) - gcodeArr[0][1]));
+
+            if ((Math.abs(result.x - gcodeArr[0][0]) <= 0.05) && (Math.abs((result.z - 1) - gcodeArr[0][1]) <= 0.05)) {
+
+              if (gcodeArr[0].length === 3) {
+                let position = gcodeArr[0][2];
                 var mess = new ROSLIB.Message({data: position});
                 cmd.publish(mess);
                 console.log("cordinate" + gcodeArr[0]);
               }
+                
                 ctx.fillStyle = "green";
                 ctx.fillRect(250 + result.x * 250, 750 - result.z * 250, 10, 10);
                 
-                gcodeArr.shift();
-                
+                gcodeArr.shift(); 
                 console.log("unshifted");
+                flightService.callService(new ROSLIB.ServiceRequest({x: gcodeArr[0][0], y: 0.0, z: (gcodeArr[0][1] + 1), yaw: 1.57, yaw_rate: 0.0, speed: 0.5, frame_id: 'aruco_122'}), function(result) {
+                  console.log('FLIGHT!!!' + JSON.stringify(result));
+                });
               }
               else {
                 ctx.fillStyle = "red";
@@ -197,13 +204,20 @@ G1 X0 Y0
                 
               }
               ctx.fill();
+            } else {
+              var land = new ROSLIB.Service({ ros: ros, name : '/land' });
+              land.callService(new ROSLIB.ServiceRequest({}), function(result) {
+                  console.log("LAND");
+              });
+
             }
             /*
             console.log("x: " + result.x);
             console.log("y: " + result.y);
             console.log("z: " + result.z);
             */
-        }), 50);
+        }), 200);
+      };
 
         var ledService = new ROSLIB.Service({ ros: ros, name : '/led/set_effect', serviceType : 'clover/Led/SetEffect' });
 
@@ -217,36 +231,21 @@ G1 X0 Y0
         }
 
         var flightService = new ROSLIB.Service({ ros: ros, name : '/navigate', serviceType : 'clover/Navigate' });
-        var armed = false;
 
         function flight() {
-          let cordinate = gcodeArr.shift();
-          if (cordinate.length == 3) {
-            var cordX = cordinate[0];
-            var cordY = cordinate[1];
-            let position = cordinate[2];
-            var mess = new ROSLIB.Message({data: position});
-            cmd.publish(mess);
-  
-          }else {
-            var cordY = cordinate[1];
-            var cordX = cordinate[0];
-          }
-          if (armed === false) {
-            flightService.callService(new ROSLIB.ServiceRequest({x: cordX, y: 0.0, z: cordY, yaw: 0.0, yaw_rate: 0.0, speed: 0.5, frame_id: 'body', auto_arm: true}), function(result) {
-                console.log('FLIGHT!!!' + JSON.stringify(result));
+                flightService.callService(new ROSLIB.ServiceRequest({x: 0, y: 0.0, z: 1.5, yaw: 0.0, yaw_rate: 0.0, speed: 0.5, frame_id: 'body', auto_arm: true}), function(result) {
+                console.log("TAKE OFF");
+                console.log (result);
+                telem();
+
+                setTimeout(() => flightService.callService(new ROSLIB.ServiceRequest({x: 0, y: 0.0, z: 1.5, yaw: 1.57, yaw_rate: 0.0, speed: 0.5, frame_id: 'aruco_122'}), function(result)  {
+                  console.log("ARUCO_122");
+                }), 7000);
+                 
             });
-            armed = true;
-          }
-          else {
-            flightService.callService(new ROSLIB.ServiceRequest({x: cordX, y: 0.0, z: cordY, yaw: 0.0, yaw_rate: 0.0, speed: 0.5, frame_id: 'body'}), function(result) {
-                console.log('FLIGHT!!!' + JSON.stringify(result));
-            });
-          }
-          // setTimeout(fl     
         }
         var dt = new Date();
-        document.getElementById("datetime").innerHTML = dt.showTime();
+        
 
         function showTime(){
           var date = new Date();
@@ -262,9 +261,16 @@ G1 X0 Y0
           var time = h + ":" + m + ":" + s + ":" + mils;
           document.getElementById("MyClockDisplay").innerText = time;
           document.getElementById("MyClockDisplay").textContent = time;
+          document.getElementById("datetime").innerHTML = dt.showTime();
     
           setTimeout(showTime, 1000);
     
+          }
+          function checking() {
+            var r = confirm("Do you want to take off?");
+            if (r == true) {
+              flight();
+            } 
           }
 
 
@@ -272,3 +278,4 @@ G1 X0 Y0
 
 </body>
 </html>
+
