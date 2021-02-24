@@ -5,7 +5,7 @@ var scale = $("#scale");
 var oldX = 0
 var oldY = 0;
 var gcodeArr = new Array(); 
-gcodeArr.push([0, 1.5]);
+gcodeArr.push([0, 0.5]);
 
 
 scale.on("input", function (event) {
