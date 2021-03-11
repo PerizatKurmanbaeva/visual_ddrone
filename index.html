@@ -19,6 +19,7 @@
   <!-- Latest compiled JavaScript -->
   <script src="js/bootstrap.min.js"></script>
   <script src="js/potrace.js"></script>
+  <script src="js/simplify.js"></script>
   
 </head>
 <body>
@@ -54,8 +55,8 @@
         </div>
         <div class="d-flex">
           <button type="button" class="btn btn-warning m-1" id="img-select">IMG</button>
-          <button type="button" class="btn btn-warning m-1" onclick="down()">Down</button>
-          <button type="button" class="btn btn-warning m-1" onclick="up()">Up</button> 
+          <!-- <button type="button" class="btn btn-warning m-1" onclick="down()">Down</button>
+          <button type="button" class="btn btn-warning m-1" onclick="up()">Up</button>-->
           <button type="button" class="btn btn-warning m-1" onclick="showTime()">Time</button>
           <div id="MyClockDisplay" class="clock" onload="showTime()"></div>
 
@@ -86,6 +87,8 @@
             <ul>
               <li>Кнопка "Resert" очищает холст.</li>
               <li>Кнопка "Show"  показывает данные, которые будут отправлятся коптеру.</li>
+              <li>Когда вы готовы запустить коптер, должны нажать кнопку "FLIGHT". Она запрашиват подтверждение, чтобы защитить от случайного нажатия.</li>
+              <li>Кнопка "IMG" загрузит фото, которое вы хотите нарисовать.</li>
             </ul>
              
              
@@ -171,8 +174,9 @@ G1 X0 Y0
 
         
         function telem() {
+
         let telemetryTimer = setInterval(() =>
-        getTelemetry.callService(new ROSLIB.ServiceRequest({ frame_id: 'aruco_122' }), function(result) {
+        getTelemetry.callService(new ROSLIB.ServiceRequest({ frame_id: 'aruco_123' }), function(result) {
             // Service respond callback
 
           if (typeof gcodeArr !== 'undefined' && gcodeArr.length != 0) {
@@ -194,7 +198,7 @@ G1 X0 Y0
                 
                 gcodeArr.shift(); 
                 console.log("unshifted");
-                flightService.callService(new ROSLIB.ServiceRequest({x: gcodeArr[0][0], y: 0.0, z: (gcodeArr[0][1] + 1), yaw: 1.57, yaw_rate: 0.0, speed: 0.5, frame_id: 'aruco_122'}), function(result) {
+                flightService.callService(new ROSLIB.ServiceRequest({x: gcodeArr[0][0], y: 0.0, z: (gcodeArr[0][1] + 1), yaw: 1.57, yaw_rate: 0.0, speed: 0.5, frame_id: 'aruco_123'}), function(result) {
                   console.log('FLIGHT!!!' + JSON.stringify(result));
                 });
               }
@@ -232,14 +236,18 @@ G1 X0 Y0
 
         var flightService = new ROSLIB.Service({ ros: ros, name : '/navigate', serviceType : 'clover/Navigate' });
 
-        function flight() {
+                function flight() {
+                  console.log(gcodeArr);
+                gcodeArr = simplify(gcodeArr, 0.01, true);
+                gcodeArr.unshift([0, 0.5]);
+                console.log(gcodeArr);
                 flightService.callService(new ROSLIB.ServiceRequest({x: 0, y: 0.0, z: 1.5, yaw: 0.0, yaw_rate: 0.0, speed: 0.5, frame_id: 'body', auto_arm: true}), function(result) {
                 console.log("TAKE OFF");
                 console.log (result);
                 telem();
 
-                setTimeout(() => flightService.callService(new ROSLIB.ServiceRequest({x: 0, y: 0.0, z: 1.5, yaw: 1.57, yaw_rate: 0.0, speed: 0.5, frame_id: 'aruco_122'}), function(result)  {
-                  console.log("ARUCO_122");
+                setTimeout(() => flightService.callService(new ROSLIB.ServiceRequest({x: 0, y: 0.0, z: 1.5, yaw: 1.57, yaw_rate: 0.0, speed: 0.5, frame_id: 'aruco_123'}), function(result)  {
+                  console.log("aruco_123");
                 }), 7000);
                  
             });
